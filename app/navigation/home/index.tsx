@@ -10,6 +10,10 @@ import * as Location from "expo-location";
 const OPENWEATHER_API_KEY = "c7f05dd3a1cc997ab160ec3a8856fe96";
 const WEATHERAPI_KEY = "23a0381572b443d6895212011252105"; 
 
+const hour = new Date().getHours();
+const isDayTime = hour >= 6 && hour < 18;
+
+
 type DailyForecast = {
   dt: number;
   temp: { day: number };
@@ -134,7 +138,7 @@ export default function Home() {
 
         {/* Temperatura + Ícone */}
         <View style={styles.temperatureWrapper}>
-          <Feather name="moon" size={200} color="#FFFFFF" />
+          <Feather name={isDayTime ? "sun" : "moon"} size={200} color="#FFFFFF" />
           <Text style={styles.temperature}>{temp}&#176;</Text>
           <Text style={styles.weatherDescription}>{description}</Text>
         </View>
