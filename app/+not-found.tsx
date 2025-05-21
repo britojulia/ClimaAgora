@@ -1,19 +1,23 @@
 import { Link, Stack } from 'expo-router';
-import { StyleSheet } from 'react-native';
-
-import { Text, View } from '@/components/Themed';
+import { StyleSheet, View, TouchableOpacity } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Text } from '@/components/Themed';
 
 export default function NotFoundScreen() {
   return (
     <>
       <Stack.Screen options={{ title: 'Oops!' }} />
-      <View style={styles.container}>
-        <Text style={styles.title}>This screen doesn't exist.</Text>
+      <LinearGradient colors={["#6a00d2", "#f7e2f6"]} style={styles.container}>
+        <View style={styles.content}>
+          <Text style={styles.title}>Ops! 404- pagina não encontrada .</Text>
 
-        <Link href="/" style={styles.link}>
-          <Text style={styles.linkText}>Go to home screen!</Text>
-        </Link>
-      </View>
+          <Link href="/" asChild>
+            <TouchableOpacity style={styles.button} activeOpacity={0.7}>
+              <Text style={styles.buttonText}>Voltar para a tela inicial</Text>
+            </TouchableOpacity>
+          </Link>
+        </View>
+      </LinearGradient>
     </>
   );
 }
@@ -21,20 +25,29 @@ export default function NotFoundScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
+  },
+  content: {
+    flex: 1,
     justifyContent: 'center',
+    alignItems: 'center',
     padding: 20,
   },
   title: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
+    color: '#4B0082',
+    marginBottom: 40,
+    textAlign: 'center',
   },
-  link: {
-    marginTop: 15,
+  button: {
+    backgroundColor: 'rgba(75, 0, 130, 0.3)', 
     paddingVertical: 15,
+    paddingHorizontal: 50,
+    borderRadius: 30,
   },
-  linkText: {
-    fontSize: 14,
-    color: '#2e78b7',
+  buttonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });

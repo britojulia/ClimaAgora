@@ -1,18 +1,17 @@
-import { Feather, Ionicons } from "@expo/vector-icons";
-import Fontisto from "@expo/vector-icons/build/Fontisto";
-import { StatusBar } from "expo-status-bar";
-import { ScrollView, StyleSheet, Text, View, ActivityIndicator, Image } from "react-native";
+import React, { useEffect, useState } from "react";
+import { StyleSheet, Text, View, ScrollView, Image, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
-import React, { useEffect, useState } from "react";
+import { StatusBar } from "expo-status-bar";
+import { Feather, Ionicons } from "@expo/vector-icons";
+import Fontisto from "@expo/vector-icons/build/Fontisto";
 import * as Location from "expo-location";
 
 const OPENWEATHER_API_KEY = "c7f05dd3a1cc997ab160ec3a8856fe96";
-const WEATHERAPI_KEY = "23a0381572b443d6895212011252105"; 
+const WEATHERAPI_KEY = "23a0381572b443d6895212011252105";
 
 const hour = new Date().getHours();
 const isDayTime = hour >= 6 && hour < 18;
-
 
 type DailyForecast = {
   dt: number;
@@ -20,81 +19,86 @@ type DailyForecast = {
   weather: { description: string; icon: string }[];
 };
 
-export default function Home() {
+function useLocation() {
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
-  const [weather, setWeather] = useState<any>(null);
-  const [forecast, setForecast] = useState<DailyForecast[]>([]);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
+      const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
-        alert("Permissão para acessar localização foi negada");
+        setErrorMsg("Permissão para acessar localização foi negada");
         setLoading(false);
         return;
       }
 
       const loc = await Location.getCurrentPositionAsync({});
       setLocation(loc);
+      setLoading(false);
     })();
   }, []);
 
- useEffect(() => {
-  async function fetchWeather() {
-    if (!location?.coords) return;
+  return { location, errorMsg, loading };
+}
 
-    try {
-      const { latitude, longitude } = location.coords;
+export default function Home() {
+  const { location, errorMsg, loading: locationLoading } = useLocation();
+  const [weather, setWeather] = useState<any>(null);
+  const [forecast, setForecast] = useState<DailyForecast[]>([]);
+  const [loading, setLoading] = useState(true);
 
-      // Clima atual (OpenWeather)
-      const weatherResponse = await fetch(
-        `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&lang=pt_br&appid=${OPENWEATHER_API_KEY}`
-      );
-      const weatherData = await weatherResponse.json();
+  useEffect(() => {
+    async function fetchWeather() {
+      if (!location?.coords) return;
 
-      // Previsão (WeatherAPI)
-      const forecastResponse = await fetch(
-        `https://api.weatherapi.com/v1/forecast.json?key=${WEATHERAPI_KEY}&q=${latitude},${longitude}&days=7&lang=pt`
-      );
-      const forecastData = await forecastResponse.json();
+      try {
+        const { latitude, longitude } = location.coords;
 
-      setWeather(weatherData);
+        const weatherResponse = await fetch(
+          `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&lang=pt_br&appid=${OPENWEATHER_API_KEY}`
+        );
+        const weatherData = await weatherResponse.json();
 
-      if (forecastData.forecast?.forecastday) {
-        const convertedForecast = forecastData.forecast.forecastday
-          .slice(1, 7)
-          .map((day: any) => ({
-            dt: new Date(day.date).getTime() / 1000,
-            temp: { day: day.day.avgtemp_c },
-            weather: [{
-              description: day.day.condition.text,
-              icon: day.day.condition.icon
-            }],
-          }));
-        setForecast(convertedForecast);
-      } else {
-        setForecast([]);
+        const forecastResponse = await fetch(
+          `https://api.weatherapi.com/v1/forecast.json?key=${WEATHERAPI_KEY}&q=${latitude},${longitude}&days=7&lang=pt`
+        );
+        const forecastData = await forecastResponse.json();
+
+        setWeather(weatherData);
+
+        if (forecastData.forecast?.forecastday) {
+          const convertedForecast = forecastData.forecast.forecastday
+            .slice(1, 7)
+            .map((day: any) => ({
+              dt: new Date(day.date).getTime() / 1000,
+              temp: { day: day.day.avgtemp_c },
+              weather: [{
+                description: day.day.condition.text,
+                icon: day.day.condition.icon,
+              }],
+            }));
+          setForecast(convertedForecast);
+        } else {
+          setForecast([]);
+        }
+      } catch (error) {
+        console.error("Erro ao buscar dados do clima:", error);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error("Erro ao buscar dados do clima:", error);
-    } finally {
-      setLoading(false);
     }
-  }
 
-  fetchWeather();
-}, [location]);
+    fetchWeather();
+  }, [location]);
 
-
-  if (loading) {
+  if (locationLoading || loading) {
     return (
       <LinearGradient colors={["#6a00d2", "#f7e2f6"]} style={styles.container}>
         <StatusBar style="light" />
-        <SafeAreaView
-          style={[styles.safeArea, { justifyContent: "center", alignItems: "center" }]}
-        >
+        <SafeAreaView style={[styles.safeArea, { justifyContent: "center", alignItems: "center" }]}>
           <ActivityIndicator size="large" color="#fff" />
+          {errorMsg && <Text style={{ color: "white", marginTop: 10 }}>{errorMsg}</Text>}
         </SafeAreaView>
       </LinearGradient>
     );
@@ -104,9 +108,7 @@ export default function Home() {
     return (
       <LinearGradient colors={["#6a00d2", "#f7e2f6"]} style={styles.container}>
         <StatusBar style="light" />
-        <SafeAreaView
-          style={[styles.safeArea, { justifyContent: "center", alignItems: "center" }]}
-        >
+        <SafeAreaView style={[styles.safeArea, { justifyContent: "center", alignItems: "center" }]}>
           <Text style={{ color: "white", fontSize: 18 }}>Não foi possível obter o clima.</Text>
         </SafeAreaView>
       </LinearGradient>
@@ -118,7 +120,7 @@ export default function Home() {
   const description = weather.weather[0].description;
   const windSpeed = Math.round(weather.wind.speed * 3.6);
   const humidity = weather.main.humidity;
-  const uvIndex = "Índice UV"; 
+  const uvIndex = "Índice UV";
 
   function getWeekday(dt: number) {
     const date = new Date(dt * 1000);
@@ -131,19 +133,16 @@ export default function Home() {
     <LinearGradient colors={["#6a00d2", "#f7e2f6"]} style={styles.container}>
       <StatusBar style="light" />
       <SafeAreaView style={styles.safeArea}>
-        {/* Localização */}
         <View style={styles.locationContainer}>
           <Text style={styles.cityText}>{city}</Text>
         </View>
 
-        {/* Temperatura + Ícone */}
         <View style={styles.temperatureWrapper}>
           <Feather name={isDayTime ? "sun" : "moon"} size={180} color="#FFFFFF" />
           <Text style={styles.temperature}>{temp}&#176;</Text>
           <Text style={styles.weatherDescription}>{description}</Text>
         </View>
 
-        {/* Informações adicionais */}
         <View style={styles.infoRow}>
           <View style={styles.infoBox}>
             <Fontisto name="wind" size={24} color="#4B0082" />
@@ -159,7 +158,6 @@ export default function Home() {
           </View>
         </View>
 
-        {/* Temperatura dos próximos dias */}
         <View style={styles.forecastContainer}>
           <View style={styles.forecastHeader}>
             <Feather name="calendar" size={20} color="#4B0082" />
@@ -184,7 +182,6 @@ export default function Home() {
     </LinearGradient>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
