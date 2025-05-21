@@ -11,11 +11,22 @@ export default function Inicial() {
     router.push('/navigation/home');
   }
 
+  function getGreeting() {
+  const hour = new Date().getHours();
+
+  if (hour >= 6 && hour < 12) return "Bom dia";
+  if (hour >= 12 && hour < 18) return "Boa tarde";
+  if (hour >= 18 && hour < 24) return "Boa noite";
+  return "Boa madrugada";
+  }
+
   return (
     <LinearGradient colors={["#f7e2f6", "#6a00d2"]} style={styles.container}>
       <View style={styles.content}>
         <FontAwesome5 name="cloud-sun" size={80} color="white" />
-        <Text style={styles.title}>Bem-vindo ao ClimaTempo!</Text>
+        <Text style={styles.greeting}>{getGreeting()}</Text>
+
+        <Text style={styles.title}>Bem-vindo ao ClimaAgora!</Text>
 
         <Text style={styles.subtitle}>
           Confira a previsão do tempo na sua cidade de forma simples.
@@ -43,6 +54,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  greeting: {
+  fontSize: 50,
+    padding: 15,
+    color: '#4B0082',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 20,
+},
+
   title: {
     fontSize: 36,
     padding: 15,
