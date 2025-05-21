@@ -1,43 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { FontAwesome5 } from '@expo/vector-icons';
-import * as Location from 'expo-location';
 
 export default function Inicial() {
   const router = useRouter();
-  const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
-
-  useEffect(() => {
-    (async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert('Permissão negada', 'Permissão para acessar localização foi negada.');
-        return;
-      }
-
-      const currentLocation = await Location.getCurrentPositionAsync({});
-      setLocation({
-        latitude: currentLocation.coords.latitude,
-        longitude: currentLocation.coords.longitude,
-      });
-    })();
-  }, []);
 
   function goToHome() {
-    if (!location) {
-      Alert.alert('Localização não está disponível agora disponível', 'Aguarde até a localização ser obtida.');
-      return;
-    }
-
-    router.push({
-      pathname: '/navigation/home',
-      params: {
-        latitude: location.latitude,
-        longitude: location.longitude,
-      },
-    });
+    router.push('/navigation/home');
   }
 
   return (
@@ -85,7 +56,7 @@ const styles = StyleSheet.create({
     color: '#4B0082',
     textAlign: 'center',
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 10, 
     lineHeight: 26,
   },
   subtitleSpam: {
@@ -100,6 +71,7 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     paddingHorizontal: 50,
     borderRadius: 30,
+    opacity: 70
   },
   buttonText: {
     color: '#fff',
