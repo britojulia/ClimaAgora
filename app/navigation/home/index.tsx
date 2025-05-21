@@ -42,7 +42,7 @@ export default function Home() {
 
  useEffect(() => {
   async function fetchWeather() {
-    if (!location?.coords) return; // <-- Aqui está a verificação segura
+    if (!location?.coords) return;
 
     try {
       const { latitude, longitude } = location.coords;
@@ -116,9 +116,9 @@ export default function Home() {
   const city = weather.name;
   const temp = Math.round(weather.main.temp);
   const description = weather.weather[0].description;
-  const windSpeed = Math.round(weather.wind.speed * 3.6); // m/s para km/h
+  const windSpeed = Math.round(weather.wind.speed * 3.6);
   const humidity = weather.main.humidity;
-  const uvIndex = "Índice UV"; // Pode adicionar futuramente
+  const uvIndex = "Índice UV"; 
 
   function getWeekday(dt: number) {
     const date = new Date(dt * 1000);
@@ -138,7 +138,7 @@ export default function Home() {
 
         {/* Temperatura + Ícone */}
         <View style={styles.temperatureWrapper}>
-          <Feather name={isDayTime ? "sun" : "moon"} size={200} color="#FFFFFF" />
+          <Feather name={isDayTime ? "sun" : "moon"} size={180} color="#FFFFFF" />
           <Text style={styles.temperature}>{temp}&#176;</Text>
           <Text style={styles.weatherDescription}>{description}</Text>
         </View>
@@ -207,15 +207,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   temperature: {
-    fontSize: 120,
+    fontSize: 130,
     color: "#FFFFFF",
     fontWeight: "bold",
     marginTop: 10,
   },
   weatherDescription: {
-    fontSize: 22,
+    fontSize: 30,
     color: "#4B0082",
-    marginTop: 8,
     fontWeight: "bold",
   },
   infoRow: {
@@ -241,7 +240,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   forecastTitle: {
-    fontSize: 16,
+    fontSize: 20,
     color: "#4B0082",
     marginLeft: 10,
   },
