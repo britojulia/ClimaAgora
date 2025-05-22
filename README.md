@@ -1,7 +1,10 @@
 🌤️ ClimaAgora - Previsão do Tempo
 Aplicativo mobile simples e funcional que exibe o clima atual e a previsão dos próximos dias com base na localização do usuário, desenvolvido com React Native, Expo, e APIs de clima.
+
 Pega a localização em tempo real do usuário
+
 Saudação de Bom dia, Boa tarde, Boa noite e Boa madrugada, conforme horário do usuário
+
 Icone inicial conforme horário do dia 🌞🌙
 
 👩‍💻 Autor
@@ -15,10 +18,10 @@ para temperatura dos próximos dias:
 https://www.weatherapi.com
 
 ⚙️ Rode a aplicação: 
-# Instale as dependências
+Instale as dependências
 npm install
 
-# Rode o projeto
+Rode o projeto
 npx expo start
 
 
